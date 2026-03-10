@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Melody's Medicines — Data Transfer</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Georgia, serif; background: #F5ECD7; color: #2C1810; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+h1 { font-size: 22px; margin-bottom: 4px; }
+p { font-size: 14px; color: #5C4033; margin-bottom: 16px; text-align: center; }
+.card { background: #FFFEF7; border: 1px solid #D4C5A9; border-radius: 10px; padding: 20px; width: 100%; max-width: 400px; margin-bottom: 16px; }
+.card h2 { font-size: 16px; color: #8B4513; margin-bottom: 10px; }
+button { padding: 12px 24px; border-radius: 8px; font-family: Georgia, serif; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; margin-bottom: 8px; }
+.btn-export { border: none; background: #4A6741; color: #F5ECD7; }
+.btn-import { border: none; background: #B8860B; color: #F5ECD7; }
+textarea { width: 100%; height: 80px; padding: 8px; font-size: 12px; font-family: monospace; border: 1px solid #D4C5A9; border-radius: 6px; background: #F5ECD7; color: #2C1810; margin-bottom: 8px; }
+.status { font-size: 13px; color: #4A6741; font-weight: 600; text-align: center; margin-top: 8px; }
+.status.error { color: #8B2500; }
+</style>
+</head>
+<body>
+
+<h1>Data Transfer</h1>
+<p>Move your Melody's Medicines save data between the local file and the online version.</p>
+
+<div class="card">
+  <h2>Export</h2>
+  <button class="btn-export" onclick="doExport()">Copy Save Data</button>
+  <textarea id="exportArea" readonly onclick="this.select()" placeholder="Your save data will appear here..."></textarea>
+  <div id="exportStatus"></div>
+</div>
+
+<div class="card">
+  <h2>Import</h2>
+  <textarea id="importArea" placeholder="Paste save data here..."></textarea>
+  <button class="btn-import" onclick="doImport()">Import & Reload</button>
+  <div id="importStatus"></div>
+</div>
+
+<script>
+var KEY = 'melodys-medicines';
+
+function doExport() {
+  var data = localStorage.getItem(KEY);
+  var el = document.getElementById('exportArea');
+  var st = document.getElementById('exportStatus');
+  if (!data) {
+    st.className = 'status error';
+    st.textContent = 'No save data found on this device!';
+    return;
+  }
+  el.value = data;
+  el.select();
+  try {
+    navigator.clipboard.writeText(data).then(function() {
+      st.className = 'status';
+      st.textContent = 'Copied to clipboard!';
+    }).catch(function() {
+      st.className = 'status';
+      st.textContent = 'Select all the text above and copy manually.';
+    });
+  } catch(e) {
+    st.className = 'status';
+    st.textContent = 'Select all the text above and copy manually.';
+  }
+}
+
+function doImport() {
+  var raw = document.getElementById('importArea').value.trim();
+  var st = document.getElementById('importStatus');
+  if (!raw) {
+    st.className = 'status error';
+    st.textContent = 'Paste your save data first!';
+    return;
+  }
+  try {
+    JSON.parse(raw);
+    localStorage.setItem(KEY, raw);
+    st.className = 'status';
+    st.textContent = 'Imported! Reloading...';
+    setTimeout(function() { location.reload(); }, 500);
+  } catch(e) {
+    st.className = 'status error';
+    st.textContent = 'Invalid data — make sure you pasted the full export.';
+  }
+}
+</script>
+</body>
+</html>
