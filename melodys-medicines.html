@@ -910,6 +910,38 @@ let planner = {
 };
 let plannerUI = { search1: '', search2: '', showPicker: false, reagentSearch: '', deckDraw1: null, deckDraw2: null, ailmentTierOverride1: null, ailmentTierOverride2: null };
 
+// NPC Roster (synced from Obsidian vault)
+const NPCS = [
+  // Patients & Villagers
+  { name:'Sam', type:'Villager', firstAppearance:'Week 1', category:'Patients & Villagers', ailments:'Magnetic Thumb (Week 1), Hover Hives (Week 9)', desc:'Gardener at Lord Marianus\'s estate. Melody\'s very first patient\u2014ate too many beans at a feast and got magnetic thumb. Returned in Week 9 with hover hives, which would be especially bad for a groundskeeper who needs to stay grounded. Grew the flowers that now decorate the treatment room. A reliable, recurring presence.' },
+  { name:'Louis', type:'Villager', firstAppearance:'Week 2', category:'Patients & Villagers', ailments:'Baker\'s Blisters (Week 2)', desc:'A baker. Not much else established yet.' },
+  { name:'Ayesha', type:'Adventurer (Druid)', firstAppearance:'Week 3', category:'Patients & Villagers', ailments:'Druidic Madness (Week 3), Dragon Sickness (Week 4)', desc:'A beautiful druid who became one of Melody\'s first real friends. Came in with druidic madness, spending her visit rearranging all of Melody\'s furniture into circles. Returned almost immediately with dragon sickness\u2014she\'s clearly a risk taker. Has a cozy home in the woods that Melody visited during Week 5 downtime. Gifted Melody the raven Flitter as thanks. Also the one who asked Melody to help Mr. Hask, the spriggan who didn\'t survive. Has stories about crazy fairy encounters.' },
+  { name:'Jonas', type:'Adventurer (Bard)', firstAppearance:'Week 6', category:'Patients & Villagers', ailments:'Ventriloquist Cough (Week 6)', desc:'A bard cured of ventriloquist cough. Not much else established yet.' },
+  { name:'Wesley', type:'Villager', firstAppearance:'Week 7', category:'Patients & Villagers', ailments:'Adventurer\'s Rash (Week 7 \u2014 FAILED)', desc:'A villager who came in with adventurer\'s rash. Melody failed to cure him in time, and he ran off to seek his fortune elsewhere. He\'d promised his girlfriend Buttercup that he\'d become rich. A Princess Bride reference. Current status: unknown. Possibly becoming the Dread Pirate Roberts. Possibly eaten by shrieking eels.' },
+  { name:'Buttercup', type:'Villager', firstAppearance:'Week 7 (mentioned)', category:'Patients & Villagers', desc:'Wesley\'s girlfriend. The reason he left to seek his fortune. Never directly encountered. A Princess Bride reference.' },
+  { name:'The Carpenter', type:'Villager (Tradesperson)', firstAppearance:'Spring Festival (mentioned)', category:'Patients & Villagers', ailments:'Tinker\'s Troubles (not yet treated)', desc:'A carpenter Melody met at the Spring Festival market. Works at a place called The Workshop. Melody promised to visit and help with an ailment he\'s been troubled by. This is Melody\'s entry point into the Workshop DLC content.' },
+  // Friends & Allies
+  { name:'Viper', type:'Adventurer', firstAppearance:'Week 4', category:'Friends & Allies', desc:'A skeptical adventurer Melody met at a waystone on Moonbreaker Mountain. Was surveying the mountain and agreed to travel together. Initially doubtful of Melody\'s stories about the sphinx encounter. They survived multiple gull drake attacks together, found the secret path to the summit, camped under the stars, and met Sirius the star dragon together. Each received a Moonstone as proof of their achievement. Parted ways with a promise to return and tell Melody stories of his travels. The one that got away (romantically speaking)\u2014Melody sent him off to protect the genre.' },
+  { name:'Tyr', type:'Monster (Dwarf)', firstAppearance:'Week 6', category:'Friends & Allies', desc:'A jovial dwarven fisherman at Meltwater Loch. Shares Melody\'s hatred of gull drakes. Gave her gull drake guano once he learned about her mountain ordeal. Helped her collect dentist crabs. Part of Melody\'s growing network of helpful strangers. Can be traded with for Loch reagents of value 5 or lower.' },
+  { name:'Karish', type:'Monster (Naiad)', firstAppearance:'Week 7', category:'Friends & Allies', desc:'An arrogant naiad living in the river at Glimmerwood Grove. Saved Melody when she tripped and fell into the water. She owes him a thank-you gift and acknowledges the debt, even if he\'s insufferable about it.' },
+  { name:'Asteria', type:'Monster (Siren)', firstAppearance:'Week 11', category:'Friends & Allies', desc:'A siren at Meltwater Loch. Was practicing her singing when Melody happened to pass by, got caught completely off guard, and fell for the song. Woke up on the shore with Asteria apologizing profusely. Melody had never heard a siren song before and noted that the old witch\'s book said she could collect it with a wand. Potential friend.' },
+  { name:'Amalia', type:'Monster (Elf)', firstAppearance:'Week 13', category:'Friends & Allies', desc:'An otherworldly elf in Glimmerwood Grove, so ethereal Melody initially thought she was a fairy or archfey. Asked Melody for a story; Melody told her how she and Dot first met. Amalia was delighted and helped find some reagents afterward. The noble elf from the Jack draw\u2014a recurring relationship to develop.' },
+  // Recurring Entities
+  { name:'The Bound Demon', type:'Entity (Sealed)', firstAppearance:'Week 1', category:'Recurring Entities', location:'Hero\'s Hollow', desc:'An ancient demon sealed in a chamber at the center of Hero\'s Hollow. Melody encountered him on her very first foraging trip. He called out, complained about being bored, and upon seeing her pack, started bragging about being a master herbalist, tradesperson, and "perfect being in general." Melody tuned him out and left before getting into trouble. Subject of "Purple Tide," a book on dark magic that Melody found in Week 6. She\'s already used the vampire chapter to craft her wand. The most interesting thread, according to Melody\'s player, despite the restraint shown in not engaging further. Yet.' },
+  { name:'The Sphinx', type:'Entity', firstAppearance:'Week 4', category:'Recurring Entities', location:'Moonbreaker Mountain', desc:'A beautiful but cold sphinx who challenged Melody to a riddle. Melody answered correctly but received no reward\u2014just the relief of surviving the encounter. Later told Viper about it; he was skeptical.' },
+  { name:'Sirius', type:'Entity (Star Dragon)', firstAppearance:'Week 4', category:'Recurring Entities', location:'Moonbreaker Mountain Summit', desc:'The star dragon who lives at the summit of Moonbreaker Mountain. Congratulated Melody and Viper for reaching the peak. Asked them not to share the path but gave each a piece of Moonstone to prove their achievement. Told them the story of the cow constellation\u2014refugees escaping war, struggling to survive, finding a cow whose milk could sate hunger instantly, and then the cow mysteriously vanishing once they found a home. Melody had never heard it before and it made her want to learn more stories.' },
+  { name:'Selene', type:'Deity', firstAppearance:'Week 4 (shrine)', category:'Recurring Entities', location:'Moonbreaker Mountain', desc:'The moon goddess. Has a shrine on Moonbreaker Mountain where Melody stopped to pay respects during her Week 4 foraging trip. Visited again in Week 11. Not directly encountered, but clearly part of High Rannoc\'s spiritual landscape.' },
+  // Authority Figures
+  { name:'Lord Marianus', type:'Villager (Nobility)', firstAppearance:'Spring Festival', category:'Authority Figures', desc:'The local lord. Sam works as a gardener at his estate (where Dot almost caused an incident stealing roses). Attended the Spring Festival and hinted that Melody should send him a batch of her prize-winning darkwater rose cinnamon rolls.' },
+  // Antagonists & Threats
+  { name:'The Truffle Hunter', type:'Unknown', firstAppearance:'Week 9', category:'Antagonists & Threats', desc:'Shot at Melody while she was foraging in the forest. She escaped but has sworn to find out who they are and give them a piece of her mind. Unresolved threat.' },
+  // Gone But Not Forgotten
+  { name:'Mr. Hask', type:'Monster (Spriggan)', firstAppearance:'Week 8', category:'Gone But Not Forgotten', status:'Deceased (left a seed)', desc:'A spriggan that Ayesha tried to help rejuvenate but accidentally gave potion poison instead. She asked Melody to help, but Melody got stuck in a trap dungeon and by the time she got back, Hask had already withered. He left a seed behind\u2014Ayesha said spriggans don\'t die the same way humanoids do. Melody\'s journal entry: "We\'ll see you in the future, Mr. Hask. May you be evergreen."' },
+  // The Old Witch
+  { name:'The Old Witch', type:'Unknown', firstAppearance:'Background', category:'The Old Witch', status:'Missing', desc:'Melody\'s predecessor at the cottage. Left behind helpful notes that Melody has used throughout her practice, including information that helped her craft her wand. Fan of the Rocs glowball team\u2014Melody found their flag while clearing the yard and washed it, storing it in the cabinet in case the old witch returns. Melody hopes to meet her someday and chat about the glowball season over coffee and sweets. Clues found: The Rocs glowball team flag (Week 12).' },
+];
+const NPC_CATEGORIES = ['Patients & Villagers','Friends & Allies','Recurring Entities','Authority Figures','Antagonists & Threats','Gone But Not Forgotten','The Old Witch'];
+
 // Deck state
 const SUITS = ['♥','♦','♣','♠'];
 const CARD_VALUES = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -1262,6 +1294,7 @@ ${[{n:'Treatment Room',c:'300',e:'Timers +3, +10s/potion'},{n:'Spirit Seal',c:'3
 let ailmentSearch = '', ailmentTierFilter = 'all', expandedAilment = null;
 let expandedClueKey = null;
 let expandedEventKey = null;
+let expandedNpcKey = null;
 
 function renderAilments() {
   const src = activeSources();
@@ -2793,10 +2826,39 @@ let extrasView = 'festivals';
 function renderExtras() {
   const showTinkerer = tinkererEnabled;
   let html = `<div class="pills">
+    <button class="pill ${extrasView==='npcs'?'active':''}" style="${extrasView==='npcs'?'border-color:var(--green);background:var(--green);color:var(--parchment)':''}" onclick="extrasView='npcs';renderContent()">NPCs</button>
     <button class="pill ${extrasView==='festivals'?'active':''}" style="${extrasView==='festivals'?'border-color:var(--accentGold);background:var(--accentGold);color:var(--parchment)':''}" onclick="extrasView='festivals';renderContent()">Festivals</button>
     <button class="pill ${extrasView==='mystery'?'active':''}" style="${extrasView==='mystery'?'border-color:var(--blue);background:var(--blue);color:var(--parchment)':''}" onclick="extrasView='mystery';renderContent()">Witch Mystery</button>
     ${showTinkerer ? `<button class="pill ${extrasView==='projects'?'active':''}" style="${extrasView==='projects'?'border-color:var(--purple);background:var(--purple);color:var(--parchment)':''}" onclick="extrasView='projects';renderContent()">Projects</button>` : ''}
   </div>`;
+
+  if (extrasView === 'npcs') {
+    for (const cat of NPC_CATEGORIES) {
+      const npcsInCat = NPCS.filter(n => n.category === cat);
+      if (npcsInCat.length === 0) continue;
+      html += `<h2 class="section-title">${esc(cat)}</h2>`;
+      for (const npc of npcsInCat) {
+        const key = npc.name;
+        const expanded = expandedNpcKey === key;
+        html += `<div class="card" style="cursor:pointer" onclick="expandedNpcKey = expandedNpcKey === '${escJs(key)}' ? null : '${escJs(key)}'; renderContent()">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <span style="font-size:16px;font-weight:700;color:var(--ink)">${esc(npc.name)}</span>
+              <span class="tag-badge" style="margin-left:6px">${esc(npc.type)}</span>
+            </div>
+            <span class="event-expand-btn" style="transform:${expanded ? 'rotate(180deg)' : 'none'}">▾</span>
+          </div>
+          <div style="font-size:12px;color:var(--inkFaded);margin-top:4px">First appeared: ${esc(npc.firstAppearance)}</div>
+          ${expanded ? `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--parchDark)">
+            ${npc.ailments ? `<div style="font-size:13px;color:var(--inkLight);margin-bottom:6px"><b>Ailments:</b> ${esc(npc.ailments)}</div>` : ''}
+            ${npc.location ? `<div style="font-size:13px;color:var(--inkLight);margin-bottom:6px"><b>Location:</b> ${esc(npc.location)}</div>` : ''}
+            ${npc.status ? `<div style="font-size:13px;color:var(--redSoft);margin-bottom:6px"><b>Status:</b> ${esc(npc.status)}</div>` : ''}
+            <div style="font-size:13px;color:var(--inkLight);line-height:1.6">${esc(npc.desc)}</div>
+          </div>` : ''}
+        </div>`;
+      }
+    }
+  }
 
   if (extrasView === 'festivals') {
     html += '<p class="body" style="font-style:italic">One per season, end of 13-week season. No patients or timer.</p>';
