@@ -351,6 +351,16 @@ ol.body { font-size: 14px; color: var(--inkLight); line-height: 1.8; padding-lef
 <div id="settingsPanel" class="settings-panel">
   <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">Active Expansions</div>
   <label><input type="checkbox" id="tinkererToggle" checked onchange="toggleExpansion()"> <span style="display:flex;align-items:center;gap:6px">Tinkerer's Troubles <span class="dlc-badge">DLC</span></span></label>
+  <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--parchDeep)">
+    <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:8px">Save Data</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn btn-outline" style="padding:6px 14px;font-size:12px" onclick="exportData()">Export (Copy)</button>
+      <button class="btn btn-outline" style="padding:6px 14px;font-size:12px" onclick="document.getElementById('importArea').style.display='block';document.getElementById('importConfirmBtn').style.display='inline-block'">Import</button>
+    </div>
+    <textarea id="exportArea" style="display:none;width:100%;height:60px;margin-top:8px;padding:6px;font-size:11px;font-family:monospace;border:1px solid var(--parchDeep);border-radius:6px;background:var(--cardBg);color:var(--ink)" readonly onclick="this.select()"></textarea>
+    <textarea id="importArea" placeholder="Paste exported save data here..." style="display:none;width:100%;height:60px;margin-top:8px;padding:6px;font-size:11px;font-family:monospace;border:1px solid var(--parchDeep);border-radius:6px;background:var(--cardBg);color:var(--ink)"></textarea>
+    <button id="importConfirmBtn" class="btn btn-gold" style="display:none;padding:6px 14px;font-size:12px;margin-top:6px" onclick="importData()">Confirm Import</button>
+  </div>
 </div>
 <div class="subpage-bar" id="subpageBar"></div>
 <div class="content" id="contentArea"></div>
@@ -1140,6 +1150,32 @@ function toggleExpansion() {
   tinkererEnabled = document.getElementById('tinkererToggle').checked;
   document.getElementById('footerText').textContent = 'Core' + (tinkererEnabled ? " + Tinkerer's Troubles" : '') + ' · High Rannoc';
   renderContent();
+}
+
+function exportData() {
+  const data = localStorage.getItem(STORAGE_KEY);
+  if (!data) { alert('No save data found!'); return; }
+  navigator.clipboard.writeText(data).then(() => {
+    alert('Save data copied to clipboard! Paste it into Import on your other device.');
+  }).catch(() => {
+    // Fallback: show in a text area for manual copy
+    const el = document.getElementById('exportArea');
+    if (el) { el.value = data; el.style.display = 'block'; el.select(); }
+  });
+}
+
+function importData() {
+  const el = document.getElementById('importArea');
+  const raw = el ? el.value.trim() : '';
+  if (!raw) { alert('Paste your save data first!'); return; }
+  try {
+    JSON.parse(raw); // validate it's JSON
+    localStorage.setItem(STORAGE_KEY, raw);
+    alert('Data imported! Reloading...');
+    location.reload();
+  } catch(e) {
+    alert('Invalid data — make sure you pasted the full export.');
+  }
 }
 
 // ============================================================
