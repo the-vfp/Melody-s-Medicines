@@ -1,9 +1,9 @@
-const CACHE_NAME = 'melodys-medicines-v1';
+const CACHE_NAME = 'melodys-medicines-v2';
 const ASSETS = [
   './',
   './melodys-medicines.html',
   './manifest.json',
-  './icon.svg'
+  './icon.png'
 ];
 
 self.addEventListener('install', e => {
