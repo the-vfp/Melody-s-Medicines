@@ -30,7 +30,7 @@ while (my $c = $d->accept) {
       my $type = $mime{lc($ext || '')} || 'application/octet-stream';
       open my $fh, '<:raw', $file or next;
       local $/; my $body = <$fh>; close $fh;
-      $c->send_response(HTTP::Response->new(200, 'OK', ['Content-Type' => $type, 'Content-Length' => length($body)], $body));
+      $c->send_response(HTTP::Response->new(200, 'OK', ['Content-Type' => $type, 'Content-Length' => length($body), 'Cache-Control' => 'no-store'], $body));
     } else {
       $c->send_error(RC_NOT_FOUND);
     }

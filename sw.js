@@ -1,4 +1,4 @@
-const CACHE_NAME = 'melodys-medicines-v4';
+const CACHE_NAME = 'melodys-medicines-v5';
 const ASSETS = [
   './',
   './melodys-medicines.html',
